@@ -4,6 +4,7 @@ import { MessageSquare, Plus } from 'lucide-react';
 import { useChat } from '@/hooks/useChat';
 import ChatWindow from '@/components/ChatWindow';
 import ChatInput from '@/components/ChatInput';
+import TypingIndicator from '@/components/TypingIndicator';
 
 export default function Home() {
   const {

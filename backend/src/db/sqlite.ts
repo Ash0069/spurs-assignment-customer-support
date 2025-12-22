@@ -10,7 +10,7 @@ db.exec(`
   );
 
   CREATE TABLE IF NOT EXISTS messages (
-    id TEXT PRIMARY KEY,
+    id TEXT PRIMARY KEY AUTOINCREMENT,
     conversation_id TEXT,
     role TEXT,
     content TEXT,

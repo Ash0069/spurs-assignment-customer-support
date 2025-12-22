@@ -1,22 +1,67 @@
 import db from "../db/sqlite.js";
 import { randomUUID } from "crypto";
+import { generateReply } from "./llm.service.js";
 
-export const processChat = ({ message, conversationId }: any) => {
+interface ProcessChatInput {
+  message: string;
+  conversationId?: string;
+}
+
+export async function processChat({
+  message,
+  conversationId,
+}: ProcessChatInput) {
   const convoId = conversationId ?? randomUUID();
 
+  // Ensure conversation exists
   db.prepare(
-    "INSERT OR IGNORE INTO conversations (id) VALUES (?)"
+    `INSERT OR IGNORE INTO conversations (id) VALUES (?)`
   ).run(convoId);
 
+  const now = new Date().toISOString();
+
+  // Save user message
   db.prepare(
-    "INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)"
-  ).run(randomUUID(), convoId, "user", message);
+    `
+    INSERT INTO messages (conversation_id, role, content, created_at)
+    VALUES (?, 'user', ?, ?)
+    `
+  ).run(convoId, message, now);
 
-  const reply = "This is a mock AI response.";
+  // Fetch conversation history
+  const history = db
+    .prepare(
+      `
+      SELECT role, content
+      FROM messages
+      WHERE conversation_id = ?
+      ORDER BY created_at ASC
+      `
+    )
+    .all(convoId) as { role: "user" | "assistant"; content: string }[];
 
-  db.prepare(
-    "INSERT INTO messages (id, conversation_id, role, content) VALUES (?, ?, ?, ?)"
-  ).run(randomUUID(), convoId, "assistant", reply);
+  // Call AI
+  const aiReply = await generateReply(history, message);
 
-  return { conversationId: convoId, reply };
-};
+  const aiTimestamp = new Date().toISOString();
+
+  // Save AI message
+  const result = db
+    .prepare(
+      `
+      INSERT INTO messages (conversation_id, role, content, created_at)
+      VALUES (?, 'assistant', ?, ?)
+      `
+    )
+    .run(convoId, aiReply, aiTimestamp);
+
+  return {
+    conversationId: convoId,
+    message: {
+      id: result.lastInsertRowid,
+      role: "ai",
+      content: aiReply,
+      timestamp: aiTimestamp,
+    },
+  };
+}

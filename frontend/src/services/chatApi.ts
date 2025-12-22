@@ -60,6 +60,7 @@ export const chatApi = {
 
         if (!response.ok) {
             throw new Error("Failed to create chat");
+
         }
 
         return response.json();

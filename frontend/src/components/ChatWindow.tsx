@@ -12,21 +12,34 @@ interface ChatWindowProps {
 
 export default function ChatWindow({ messages, isLoading }: ChatWindowProps) {
     const messagesEndRef = useRef<HTMLDivElement>(null);
-
-    const scrollToBottom = () => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    const lastMessageCountRef = useRef(0);
 
     useEffect(() => {
-        scrollToBottom();
+        // Only auto-scroll when messages are appended
+        if (messages.length > lastMessageCountRef.current) {
+            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+        }
+
+        lastMessageCountRef.current = messages.length;
     }, [messages]);
 
     return (
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.map((message) => (
-                <MessageBubble key={message.id} message={message} />
+            {messages.length === 0 && !isLoading && (
+                <div className="text-center text-sm text-gray-400 mt-10">
+                    Start the conversation by sending a message
+                </div>
+            )}
+
+            {messages.map((message, index) => (
+                <MessageBubble
+                    key={`${message.id}-${index}`}
+                    message={message}
+                />
             ))}
+
             {isLoading && <TypingIndicator />}
+
             <div ref={messagesEndRef} />
         </div>
     );
