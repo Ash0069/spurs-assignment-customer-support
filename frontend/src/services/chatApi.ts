@@ -53,19 +53,15 @@ export const chatApi = {
         return data.messages;
     },
 
-    async createChat(): Promise<Chat> {
+    async createChat(): Promise<{ conversationId: string }> {
         const response = await fetch(`${API_BASE_URL}${ENDPOINTS.CREATE_CHAT}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            method: "POST",
         });
 
         if (!response.ok) {
-            throw new Error('Failed to create chat');
+            throw new Error("Failed to create chat");
         }
 
-        const data = await response.json();
-        return data.chat;
+        return response.json();
     },
 };

@@ -52,8 +52,24 @@ export const useChat = () => {
     /**
      * 🔹 Start new chat
      */
-    const createNewChat = useCallback(() => {
-        setActiveChat(null);
+    const createNewChat = useCallback(async () => {
+        try {
+            const { conversationId } = await chatApi.createChat();
+
+            const newChat: Chat = {
+                id: conversationId,
+                conversationId,
+                title: "New Chat",
+                lastMessage: "",
+                timestamp: new Date().toISOString(),
+            };
+
+            setChats((prev) => [newChat, ...prev]);
+            setMessages((prev) => ({ ...prev, [conversationId]: [] }));
+            setActiveChat(conversationId);
+        } catch (err) {
+            console.error("Failed to create chat:", err);
+        }
     }, []);
 
     /**
