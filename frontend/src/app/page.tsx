@@ -12,6 +12,7 @@ export default function Home() {
     activeChat,
     messages,
     isLoading,
+    deleteChat,
     setActiveChat,
     createNewChat,
     sendMessage,
@@ -35,32 +36,51 @@ export default function Home() {
           </button>
         </div>
 
+        {/* Chat List */}
         <div className="flex-1 overflow-y-auto">
-          {chats.map((chat) => (
-            <button
-              key={chat.id}
-              onClick={() => setActiveChat(chat.id)}
-              className={`w-full p-4 text-left border-b border-gray-100 hover:bg-gray-50 transition-colors ${activeChat === chat.id
-                ? 'bg-blue-50 border-l-4 border-l-blue-600'
-                : ''
-                }`}
-            >
-              <div className="flex items-start gap-3">
-                <MessageSquare size={20} className="text-gray-400 mt-1" />
-                <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
-                    {chat.title}
-                  </p>
-                  <p className="text-sm text-gray-500 truncate">
-                    {chat.lastMessage || 'No messages yet'}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    {new Date(chat.timestamp).toLocaleTimeString()}
-                  </p>
+          {chats.map((chat) => {
+            const isActive = activeChat === chat.id;
+
+            return (
+              <div
+                key={chat.id}
+                onClick={() => setActiveChat(chat.id)}
+                role="button"
+                tabIndex={0}
+                className={`w-full p-4 border-b border-gray-100 cursor-pointer hover:bg-gray-50 transition-colors ${isActive ? 'bg-blue-50 border-l-4 border-l-blue-600' : ''
+                  }`}
+              >
+                <div className="flex items-start gap-3">
+                  <MessageSquare size={20} className="text-gray-400 mt-1" />
+
+                  <div className="flex-1 min-w-0">
+                    <p className="font-medium text-gray-900 truncate">
+                      {chat.title}
+                    </p>
+
+                    <p className="text-sm text-gray-500 truncate">
+                      {chat.lastMessage || 'No messages yet'}
+                    </p>
+
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(chat.timestamp).toLocaleTimeString()}
+                    </p>
+
+                    {/* Delete button (valid HTML, no hydration issue) */}
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        deleteChat(chat.conversationId);
+                      }}
+                      className="mt-1 text-red-500 text-sm hover:text-red-600"
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
-            </button>
-          ))}
+            );
+          })}
 
           {chats.length === 0 && (
             <div className="p-6 text-center text-sm text-gray-500">
@@ -79,7 +99,7 @@ export default function Home() {
               {currentChat.title}
             </h2>
             <p className="text-sm text-gray-500">
-              Session ID: {currentChat.conversationId}
+              Conversation ID: {currentChat.conversationId}
             </p>
           </div>
         ) : (
@@ -89,6 +109,9 @@ export default function Home() {
         )}
 
         <ChatWindow messages={messages} isLoading={isLoading} />
+
+        {isLoading && <TypingIndicator />}
+
         <ChatInput onSend={sendMessage} disabled={isLoading} />
       </div>
     </div>

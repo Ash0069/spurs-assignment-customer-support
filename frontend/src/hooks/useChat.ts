@@ -72,6 +72,28 @@ export const useChat = () => {
         }
     }, []);
 
+    const deleteChatById = useCallback(async (conversationId: string) => {
+        try {
+            await chatApi.deleteChat(conversationId);
+
+            setChats((prev) =>
+                prev.filter((chat) => chat.conversationId !== conversationId)
+            );
+
+            setMessages((prev) => {
+                const copy = { ...prev };
+                delete copy[conversationId];
+                return copy;
+            });
+
+            setActiveChat((prev) =>
+                prev === conversationId ? null : prev
+            );
+        } catch (err) {
+            console.error("Failed to delete chat:", err);
+        }
+    }, []);
+
     /**
      * 🔹 Send message
      */
@@ -154,6 +176,7 @@ export const useChat = () => {
         activeChat,
         messages: activeChat ? messages[activeChat] || [] : [],
         isLoading,
+        deleteChat: deleteChatById,
         setActiveChat,
         createNewChat,
         sendMessage: sendChatMessageHook,

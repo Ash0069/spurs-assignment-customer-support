@@ -65,4 +65,17 @@ export const chatApi = {
 
         return response.json();
     },
+
+    async deleteChat(conversationId: string): Promise<void> {
+        const res = await fetch(
+            `${API_BASE_URL}${ENDPOINTS.DELETE_CHAT}/${conversationId}`,
+            {
+                method: "DELETE",
+            }
+        );
+
+        if (!res.ok) {
+            throw new Error("Failed to delete chat");
+        }
+    }
 };
