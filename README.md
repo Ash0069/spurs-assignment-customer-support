@@ -1,6 +1,6 @@
 # 🚀 AI Customer Support Chat – Full Stack Application
 
-A full-stack customer support chat simulation using **Next.js**, **Express.js**, **SQLite**, **Redis**, and **Mistral AI**. Users can chat with an AI assistant that responds like a support agent for an e-commerce store.
+A full-stack customer support chat simulation using **Next.js**, **Express.js**, **Turso (SQLite)**, **Redis**, and **Mistral AI**. Users can chat with an AI assistant that responds like a support agent for an e-commerce store.
 
 ---
 
@@ -54,20 +54,15 @@ npm start
 
 Backend runs at: `http://localhost:3001`
 
-### 3. Database Setup (SQLite)
+### 3. Database Setup (Turso/SQLite)
 
-SQLite is file-based; no server required.
-
-**Automatic Setup:** The file `database.sqlite` is auto-created on first run.
-
-If you have migrations:
-```bash
-sqlite3 database.sqlite < migrations/schema.sql
-```
+This project uses **Turso** - a cloud-hosted SQLite database with edge replication.
 
 **Tables:**
 - `conversations`
 - `messages`
+
+The database schema is automatically created on first connection.
 
 ### 4. Backend Environment Variables
 
@@ -75,6 +70,10 @@ Create `backend/.env`:
 
 ```env
 PORT=3001
+
+# Turso Database
+TURSO_DATABASE_URL=libsql://your-database-url.turso.io
+TURSO_AUTH_TOKEN=your_turso_auth_token_here
 
 # Mistral AI
 MISTRAL_API_KEY=your_mistral_api_key_here
@@ -84,6 +83,7 @@ REDIS_URL=rediss://default:<PASSWORD>@<HOST>:<PORT>
 ```
 
 **Get keys from:**
+- Turso → https://turso.tech (free tier available)
 - Mistral → https://console.mistral.ai
 - Upstash Redis (free) → https://upstash.com/redis
 
