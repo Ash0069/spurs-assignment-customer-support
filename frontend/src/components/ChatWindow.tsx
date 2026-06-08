@@ -17,20 +17,14 @@ export default function ChatWindow({ messages, isLoading }: ChatWindowProps) {
     useEffect(() => {
         // Only auto-scroll when messages are appended
         if (messages.length > lastMessageCountRef.current) {
-            messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
+            messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
         }
 
         lastMessageCountRef.current = messages.length;
     }, [messages]);
 
     return (
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
-            {messages.length === 0 && !isLoading && (
-                <div className="text-center text-sm text-gray-400 mt-10">
-                    Start the conversation by sending a message
-                </div>
-            )}
-
+        <div className="flex-1 overflow-y-auto px-6 py-6 space-y-5 bg-[var(--bg-primary)]">
             {messages.map((message, index) => (
                 <MessageBubble
                     key={`${message.id}-${index}`}
